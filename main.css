@@ -45,7 +45,7 @@ body {
   }
 }
 
-/* KHUNG TRANG 1 */
+/*  TRANG 1 */
 .main-content {
   flex: 1;
   display: flex;
@@ -70,7 +70,16 @@ body {
   line-height: 1.1;
   letter-spacing: -0.025em;
   margin-bottom: 1rem;
-  color: #FF9900; /* Màu vàng */
+  
+
+  background: linear-gradient(to right, #5A189A, #F59E0B);
+  
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  
+
+  color: transparent;
 }
 
 @media (min-width: 640px) {
