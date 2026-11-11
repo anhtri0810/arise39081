@@ -1,60 +1,941 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARISE 39081 | Ams Robotics Innovation and Science Engineering</title>
+    <title>ARISE 39081 | Ams Robotics Innovation Science Engineering</title>
     
+    <!-- Google Fonts: Montserrat (matching greenams.com) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="main.css">
-</head>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ariseBlue: '#8da4ff',
+                        ariseDark: '#0D1526',
+                        ariseAmber: '#f59e0b',
+                        ariseCyan: '#00f2fe',
+                        greenAms: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
 
-<body>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
     
-    <!-- page 1 -->
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <!-- Background 2D Interactive Starfield Canvas -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Top Navigation Bar -->
     <nav class="navbar">
-        <div class="logo-group">
-            <img src="logo-arise-round.png" alt="ARISE Logo" class="logo-img">
+        <a href="#home-section" class="nav-left">
+            <img src="logo-arise-round-black.png" alt="ARISE Logo" class="logo-img" onerror="this.style.display='none'">
+            <div class="nav-brand">
+                <span class="brand-title">ARISE / 39081</span>
+                <span class="brand-subtitle" data-i18n="brandSubtitle">HANOI - AMSTERDAM HIGH SCHOOL FOR GIFTED</span>
+            </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="nav-links-desktop hidden xl:flex items-center gap-5">
+            <a href="#home-section" class="nav-link active" data-i18n="navHome">HOME</a>
+            <a href="#about-section" class="nav-link" data-i18n="navStory">STORY</a>
+            <a href="#ecosystem-section" class="nav-link" data-i18n="navEcosystem">ECOSYSTEM</a>
+            <a href="#robot-section" class="nav-link" data-i18n="navRobot">THE ROBOT</a>
+            <a href="#subsystems-section" class="nav-link" data-i18n="navSubsystems">SUBSYSTEMS</a>
+            <a href="#divisions-section" class="nav-link" data-i18n="navDivisions">DIVISIONS</a>
+            <a href="#sponsors-section" class="nav-link" data-i18n="navSponsors">SPONSORS</a>
+            <a href="#awards-section" class="nav-link" data-i18n="navAwards">AWARDS</a>
+            <a href="#faq-section" class="nav-link" data-i18n="navFaq">FAQ</a>
+            <a href="#contact-section" class="nav-link" data-i18n="navContact">CONTACT</a>
+        </div>
+
+        <!-- Controls: Theme Toggle, Language -->
+        <div class="nav-right">
+            <!-- Light/Dark Mode Switcher -->
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Light/Dark Mode" title="Chuyển chế độ Sáng/Tối">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+
+            <!-- Language Dropdown -->
+            <div class="lang-dropdown" id="lang-dropdown">
+                <button id="lang-toggle" class="lang-toggle-btn" aria-haspopup="true" aria-expanded="false">
+                    <span id="lang-label">English</span>
+                    <svg class="lang-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="lang-menu" id="lang-menu">
+                    <button class="lang-option active" data-lang="en">
+                        <span>English</span>
+                        <i class="fa-solid fa-check text-[10px]"></i>
+                    </button>
+                    <button class="lang-option" data-lang="vi">
+                        <span>Tiếng Việt</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <main class="main-content">
-        <div class="text-container">
-            <h1 class="hero-title">
-                Ams Robotics <br>
-                Innovation and <br>
-                Science Engineering
-            </h1>
-            <p class="subtitle">
-                From Hanoi-Amsterdam High School for Gifted
-            </p>
+
+    <!-- SECTION 1: HERO SECTION (From hugnq.github.io/arise39081/) -->
+    <main class="hero-section" id="home-section">
+        <div class="text-content">
+            <div class="main-title">
+                <div class="title-row">
+                    <span class="first-letter">A</span>
+                    <span class="rest-letter">MS</span>
+                </div>
+                <div class="title-row">
+                    <span class="first-letter">R</span>
+                    <span class="rest-letter">OBOTICS</span>
+                </div>
+                <div class="title-row">
+                    <span class="first-letter">I</span>
+                    <span class="rest-letter">NNOVATION</span>
+                </div>
+                <div class="title-row">
+                    <span class="first-letter">S</span>
+                    <span class="rest-letter">CIENCE</span>
+                </div>
+                <div class="title-row">
+                    <span class="first-letter">E</span>
+                    <span class="rest-letter">NGINEERING</span>
+                </div>
+            </div>
+
+            <div class="slogan-badge">
+                <span class="slogan-line"></span>
+                <p class="slogan-text" data-i18n="slogan">"When I say Ams, you say Rise!"</p>
+            </div>
         </div>
 
-        <!-- Scroll for more -->
-        <a href="#more" class="scroll-indicator" aria-label="Cuộn xuống để khám phá">
-            <span class="scroll-text">(scroll for more)</span>
-            <svg class="scroll-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+        <!-- 3D Interactive Cyber Phoenix / Crane Canvas Container -->
+        <div class="robot-3d-wrapper">
+            <div id="robot-canvas-container"></div>
+            
+            <!-- 3D Viewport Controls HUD -->
+            <div class="viewport-hud">
+                <button class="hud-btn active" onclick="window.setCameraView('iso')" data-i18n="hudIso">ISO</button>
+                <button class="hud-btn" onclick="window.setCameraView('front')" data-i18n="hudFront">FRONT</button>
+                <button class="hud-btn" onclick="window.setCameraView('top')" data-i18n="hudTop">TOP</button>
+                <button class="hud-btn" onclick="window.setCameraView('wing')" data-i18n="hudWing">WING</button>
+                <button id="hudWireframeBtn" class="hud-btn" onclick="window.toggleWireframeMode()" data-i18n="hudWireframe">WIREFRAME</button>
+            </div>
+        </div>
+
+        <a href="#about-section" class="scroll-more-btn" id="scroll-more-btn">
+            <span class="scroll-text" data-i18n="scrollText">SCROLL FOR MORE</span>
+            <div class="scroll-icon">
+                <span class="chevron"></span>
+                <span class="chevron"></span>
+            </div>
         </a>
     </main>
 
-    
-    <section id="more" class="page-two">
-        <div class="about-container">
-            
-            <h2 class="about-title">About us</h2>
-            
-            <!--  -->
-            <p class="about-content">
-                nig
+
+    <!-- SECTION 2: ABOUT US / THE ODYSSEY -->
+    <section class="section-wrapper" id="about-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="storyTag">THE ODYSSEY</span>
+            <h2 class="section-title">
+                <span data-i18n="aboutWord1">ABOUT</span>
+                <span class="highlight" data-i18n="aboutWord2">US</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-3xl mx-auto text-sm sm:text-base text-zinc-400 mt-6 leading-relaxed" data-i18n="aboutSubtitle">
+                Robotics Team <strong>ARISE 39081</strong>, affiliated with HANOI - AMSTERDAM HIGH SCHOOL FOR GIFTED — a place of world-class excellence, global reach, the pinnacle of life, and the convergence of international elites.
             </p>
+        </div>
+
+        <!-- Story Intro Paragraphs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <div class="glass-card">
+                <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-lg mb-4">
+                    <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <h3 class="text-xl font-bold font-title text-white mb-3">Origin & Purpose</h3>
+                <p class="text-sm text-zinc-400 leading-relaxed" data-i18n="storyP1">
+                    Born within the halls of Hanoi - Amsterdam High School for Gifted, ARISE 39081 represents the relentless pursuit of engineering mastery, scientific curiosity, and collaborative innovation in world-class robotics competitions.
+                </p>
+            </div>
+
+            <div class="glass-card">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-lg mb-4">
+                    <i class="fa-solid fa-handshake-angle"></i>
+                </div>
+                <h3 class="text-xl font-bold font-title text-white mb-3">Gracious Professionalism</h3>
+                <p class="text-sm text-zinc-400 leading-relaxed" data-i18n="storyP2">
+                    Guided by the core philosophy of <em>Gracious Professionalism®</em>, our students design, fabricate, wire, and program competition robots from the ground up, proving that Vietnamese high school engineers stand ready on the international stage.
+                </p>
+            </div>
+        </div>
+
+        <!-- 4 Core Pillars Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-card text-center group">
+                <div class="w-14 h-14 rounded-full bg-blue-500/10 border border-blue-400/40 text-blue-400 flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                </div>
+                <h4 class="text-base font-bold text-white mb-2" data-i18n="pillar1Title">Ingenuity & Precision</h4>
+                <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="pillar1Desc">100% custom CAD design, CNC aluminum machining, and carbon-fiber 3D printing engineered to millimeter tolerances.</p>
+            </div>
+
+            <div class="glass-card text-center group">
+                <div class="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-400/40 text-amber-400 flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </div>
+                <h4 class="text-base font-bold text-white mb-2" data-i18n="pillar2Title">Gracious Professionalism®</h4>
+                <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="pillar2Desc">Fierce competition balanced with genuine camaraderie, assisting peer teams with spare parts, code, and mentorship.</p>
+            </div>
+
+            <div class="glass-card text-center group">
+                <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-400 flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <h4 class="text-base font-bold text-white mb-2" data-i18n="pillar3Title">STEM Community Outreach</h4>
+                <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="pillar3Desc">Hosting hands-on workshops and mentoring hundreds of middle-school students to spark the next generation of engineers.</p>
+            </div>
+
+            <div class="glass-card text-center group">
+                <div class="w-14 h-14 rounded-full bg-purple-500/10 border border-purple-400/40 text-purple-400 flex items-center justify-center text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-earth-americas"></i>
+                </div>
+                <h4 class="text-base font-bold text-white mb-2" data-i18n="pillar4Title">Global Ambition</h4>
+                <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="pillar4Desc">Representing Hanoi - Amsterdam at prestigious national and international championships with unwavering determination.</p>
+            </div>
         </div>
     </section>
 
-    <script src="main.js"></script>
+
+    <!-- SECTION 3: HANOI - AMSTERDAM ROBOTICS ECOSYSTEM (GreenAms Alliance Integration) -->
+    <section class="section-wrapper" id="ecosystem-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="ecoTag">AMS ROBOTICS ECOSYSTEM</span>
+            <h2 class="section-title">
+                <span data-i18n="ecoTitle1">UNITED UNDER</span>
+                <span class="highlight" data-i18n="ecoTitle2">ONE CREST</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="ecoDesc">
+                Hanoi - Amsterdam High School for Gifted proudly fosters a world-class robotics heritage with two premier teams leading the nation:
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- ARISE 39081 Card -->
+            <div class="glass-card border-blue-500/30 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-tech font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                            FIRST Tech Challenge (FTC)
+                        </span>
+                        <span class="text-xs font-tech text-zinc-500">TEAM #39081</span>
+                    </div>
+                    <h3 class="text-2xl font-black font-title text-white mb-3" data-i18n="ecoAriseTitle">ARISE 39081 (FTC Division)</h3>
+                    <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed" data-i18n="ecoAriseDesc">
+                        FIRST Tech Challenge powerhouse focusing on high-speed agile robotics, autonomous vision intelligence, and compact modular engineering.
+                    </p>
+                </div>
+                <div class="pt-6 mt-6 border-t border-zinc-800/80 flex items-center justify-between text-xs font-tech">
+                    <span class="text-blue-400 font-bold">2.8 m/s Drive • 3-Wheel Odometry</span>
+                    <a href="#robot-section" class="text-white hover:text-blue-400 font-bold flex items-center gap-1">
+                        Explore Robot <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- GreenAms 24751 Card -->
+            <div class="glass-card border-emerald-500/30 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-tech font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                            FIRST Tech Challenge (FTC)
+                        </span>
+                        <span class="text-xs font-tech text-emerald-400 font-bold">TEAM #24751</span>
+                    </div>
+                    <h3 class="text-2xl font-black font-title text-white mb-2" data-i18n="ecoGreenTitle">GreenAms Robotics Team 24751</h3>
+                    <div class="text-xs text-emerald-400 font-tech font-semibold mb-3">"When I say Green, you say Ams!"</div>
+                    <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed" data-i18n="ecoGreenDesc">
+                        Vietnam's champion FIRST Tech Challenge team from Hanoi - Amsterdam High School for Gifted. FIRST World Championship Finalist Alliance & Edison Division Champions (Houston, USA), competing in FTC DECODE 2025–2026. Pioneer creators of the open-source Bamboo Bot.
+                    </p>
+                </div>
+                <div class="pt-6 mt-6 border-t border-zinc-800/80 flex items-center justify-between text-xs font-tech">
+                    <span class="text-emerald-400 font-bold">World Finalists • Bamboo Bot</span>
+                    <a href="https://www.greenams.com/" target="_blank" rel="noopener noreferrer" class="text-white hover:text-emerald-400 font-bold flex items-center gap-1.5" data-i18n="ecoLinkBtn">
+                        Visit GreenAms <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 4: THE ROBOT - PHOENIX PRIME v2.4 -->
+    <section class="section-wrapper" id="robot-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="robotTag">COMPETITION MACHINE</span>
+            <h2 class="section-title">
+                <span data-i18n="robotTitle1">PHOENIX</span>
+                <span class="highlight" data-i18n="robotTitle2">PRIME v2.4</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="robotDesc">
+                Our flagship FTC competition robot engineered for speed, reliability, and precision scoring under extreme match pressures.
+            </p>
+        </div>
+
+        <!-- Live Performance KPI Counters -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="glass-card text-center py-4">
+                <div class="text-3xl sm:text-4xl font-black font-tech text-white" data-i18n="stat1Val">2.8 m/s</div>
+                <div class="text-[11px] text-zinc-400 uppercase tracking-widest mt-1 font-tech" data-i18n="stat1Label">MAX DRIVE SPEED</div>
+            </div>
+
+            <div class="glass-card text-center py-4">
+                <div class="text-3xl sm:text-4xl font-black font-tech text-cyan-400" data-i18n="stat2Val">99.4%</div>
+                <div class="text-[11px] text-zinc-400 uppercase tracking-widest mt-1 font-tech" data-i18n="stat2Label">AUTO ACCURACY</div>
+            </div>
+
+            <div class="glass-card text-center py-4">
+                <div class="text-3xl sm:text-4xl font-black font-tech text-amber-400" data-i18n="stat3Val">2.2 s</div>
+                <div class="text-[11px] text-zinc-400 uppercase tracking-widest mt-1 font-tech" data-i18n="stat3Label">CYCLE TIME</div>
+            </div>
+
+            <div class="glass-card text-center py-4">
+                <div class="text-3xl sm:text-4xl font-black font-tech text-blue-400" data-i18n="stat4Val">1.8 m</div>
+                <div class="text-[11px] text-zinc-400 uppercase tracking-widest mt-1 font-tech" data-i18n="stat4Label">MAX REACH</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 5: INTERACTIVE ROBOT SUBSYSTEMS EXPLORER (Dual: Phoenix Prime v2.4 & Bamboo Bot) -->
+    <section class="section-wrapper" id="subsystems-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="subTag">INTERACTIVE ENGINEERING EXPLORER</span>
+            <h2 class="section-title">
+                <span data-i18n="subTitle1">ROBOT</span>
+                <span class="highlight" data-i18n="subTitle2">SUBSYSTEMS</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="subSubtitle">
+                Explore the internal mechanics of ARISE's Phoenix Prime v2.4 and GreenAms's open-source Bamboo Bot (FTC DECODE 2025–2026):
+            </p>
+        </div>
+
+        <!-- Robot Model Switcher -->
+        <div class="robot-selector-wrapper">
+            <button id="selectRobotArise" class="robot-selector-btn active" data-i18n="robotSelectArise">
+                PHOENIX PRIME v2.4 (ARISE #39081)
+            </button>
+            <button id="selectRobotBamboo" class="robot-selector-btn" data-i18n="robotSelectBamboo">
+                BAMBOO BOT (GART #24751 OPEN-SOURCE)
+            </button>
+        </div>
+
+        <!-- Dynamic Subsystem Selector Pills -->
+        <div id="subsystemPillsContainer" class="flex flex-wrap justify-center gap-2.5 mb-8">
+            <!-- Dynamically injected via main.js -->
+        </div>
+
+        <!-- Interactive Blueprint Detail Display -->
+        <div class="glass-card p-6 sm:p-10 border-blue-500/30">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-8 space-y-4">
+                    <span class="text-xs uppercase font-tech text-blue-400 tracking-wider font-bold">SUBSYSTEM ARCHITECTURE</span>
+                    <h3 id="subsystemDetailTitle" class="text-2xl font-black font-title text-white">
+                        Mecanum Holonomic Drivetrain
+                    </h3>
+                    <p id="subsystemDetailSpecs" class="text-sm text-zinc-300 leading-relaxed">
+                        GoBilda Strafer chassis powered by 4x YellowJacket 19.2:1 planetary gear motors (312 RPM). Equipped with 96mm precision rollers for instantaneous 360° omnidirectional translation, vector drifting, and rapid evasion.
+                    </p>
+
+                    <!-- Bamboo Bot Open Source Resources Button Box (Shown when Bamboo Bot active) -->
+                    <div id="bambooExternalLinks" class="pt-4 flex flex-wrap gap-3" style="display: none;">
+                        <a href="https://cad.onshape.com/documents/7ea464b788e1949fa1522bb3/w/0b39c0ebdd30ce0adba32528/e/dc81c2f1cafc4ea80a2b11a1" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold font-tech flex items-center gap-2 transition-all">
+                            <i class="fa-solid fa-cube"></i> <span data-i18n="bambooCadBtn">View Onshape CAD</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                        <a href="https://github.com/greenamsroboticsteam/Bamboo-bot-24751" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 text-xs font-bold font-tech flex items-center gap-2 transition-all">
+                            <i class="fa-brands fa-github"></i> <span data-i18n="bambooCodeBtn">View GitHub Code</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 bg-zinc-950/70 p-6 rounded-2xl border border-zinc-800 text-center">
+                    <div class="text-4xl text-blue-400 mb-3"><i class="fa-solid fa-microchip"></i></div>
+                    <div class="text-xs font-tech text-zinc-400 uppercase tracking-widest">FTC PLATFORM</div>
+                    <div class="text-lg font-bold font-title text-white mt-1">REV Control Hub & FTC SDK</div>
+                    <div class="text-[11px] text-zinc-500 mt-2">Zero-backlash closed-loop PID control algorithm</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 6: MEASURABLE IMPACT FIGURES (GreenAms 24751 + ARISE 39081) -->
+    <section class="section-wrapper bg-gradient-to-b from-transparent via-[#0d1629]/50 to-transparent">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="figTag">MEASURABLE IMPACT</span>
+            <h2 class="section-title">
+                <span data-i18n="figTitle1">AMS ROBOTICS</span>
+                <span class="highlight" data-i18n="figTitle2">MILESTONES</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="figDesc">
+                Verified season statistics reflecting the international reach and competitive leadership of Hanoi - Amsterdam robotics:
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-card text-center py-8">
+                <div class="text-3xl sm:text-4xl lg:text-5xl font-black font-tech text-blue-400" data-i18n="fig1Val">142,000+</div>
+                <div class="text-xs text-zinc-400 uppercase tracking-widest mt-2 font-tech" data-i18n="fig1Label">Global Media Impressions & Views</div>
+            </div>
+
+            <div class="glass-card text-center py-8">
+                <div class="text-3xl sm:text-4xl lg:text-5xl font-black font-tech text-amber-400" data-i18n="fig2Val">60+</div>
+                <div class="text-xs text-zinc-400 uppercase tracking-widest mt-2 font-tech" data-i18n="fig2Label">Connected Robotics Teams Globally</div>
+            </div>
+
+            <div class="glass-card text-center py-8">
+                <div class="text-3xl sm:text-4xl lg:text-5xl font-black font-tech text-emerald-400" data-i18n="fig3Val">5,000+</div>
+                <div class="text-xs text-zinc-400 uppercase tracking-widest mt-2 font-tech" data-i18n="fig3Label">Youth Reached via Camps & Events</div>
+            </div>
+
+            <div class="glass-card text-center py-8">
+                <div class="text-2xl sm:text-3xl lg:text-4xl font-black font-tech text-purple-400" data-i18n="fig4Val">World Finalist</div>
+                <div class="text-xs text-zinc-400 uppercase tracking-widest mt-2 font-tech" data-i18n="fig4Label">Houston World Championship 2025</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 7: SUB-TEAMS & DIVISIONS -->
+    <section class="section-wrapper" id="divisions-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="divTag">OUR DEPARTMENTS</span>
+            <h2 class="section-title">
+                <span data-i18n="divTitle1">SPECIALIZED</span>
+                <span class="highlight" data-i18n="divTitle2">DIVISIONS</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="divSubtitle">
+                Four multidisciplinary branches working in complete synergy to build world-class robotic systems.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Mechanical -->
+            <div class="glass-card flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-400/30 text-blue-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-cubes"></i>
+                    </div>
+                    <h4 class="text-base font-bold font-title text-white mb-2" data-i18n="divMechTitle">Mechanical & CAD</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed mb-4" data-i18n="divMechDesc">SolidWorks & Onshape 3D modeling, FEA stress analysis, precision CNC machining, and rapid additive manufacturing.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5 pt-3 border-t border-zinc-800">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-tech">SolidWorks</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-tech">Onshape</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-tech">CNC 6061</span>
+                </div>
+            </div>
+
+            <!-- Software -->
+            <div class="glass-card flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-400/30 text-cyan-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h4 class="text-base font-bold font-title text-white mb-2" data-i18n="divProgTitle">Software & Autonomous</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed mb-4" data-i18n="divProgDesc">FTC Java SDK, RoadRunner motion profiling, Pure Pursuit path tracking, and computer vision pipelines.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5 pt-3 border-t border-zinc-800">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-tech">Java SDK</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-tech">RoadRunner</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-tech">OpenCV</span>
+                </div>
+            </div>
+
+            <!-- Electronics -->
+            <div class="glass-card flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <h4 class="text-base font-bold font-title text-white mb-2" data-i18n="divElecTitle">Electronics & Control</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed mb-4" data-i18n="divElecDesc">REV Robotics Control Hub architectures, custom wiring harnesses, power distribution, and laser ToF sensors.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5 pt-3 border-t border-zinc-800">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-tech">REV Hub</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-tech">Laser ToF</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-tech">Power Harness</span>
+                </div>
+            </div>
+
+            <!-- Outreach -->
+            <div class="glass-card flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-400/30 text-purple-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                    <h4 class="text-base font-bold font-title text-white mb-2" data-i18n="divOutTitle">Outreach & Business</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed mb-4" data-i18n="divOutDesc">15-page Engineering Portfolio authoring, sponsorship procurement, budget management, and community STEM classes.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5 pt-3 border-t border-zinc-800">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-tech">Portfolio</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-tech">STEM Classes</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-tech">Sponsors</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 8: SPONSORSHIP TIERS & BENEFITS (GreenAms Inspired) -->
+    <section class="section-wrapper" id="sponsors-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="sponsTag">SUPPORT THE FUTURE</span>
+            <h2 class="section-title">
+                <span data-i18n="sponsTitle1">SPONSORSHIP</span>
+                <span class="highlight" data-i18n="sponsTitle2">PACKAGES</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="sponsSubtitle">
+                We are deeply grateful to our visionary corporate partners and alumni for fueling our journey to international robotics excellence.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <!-- Diamond Tier -->
+            <div class="tier-card tier-diamond flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-tech text-cyan-400 font-bold uppercase tracking-widest block mb-1">TIER 1</span>
+                    <h3 class="text-xl font-black font-title text-white" data-i18n="tierDiamondName">Diamond Partner</h3>
+                    <div class="text-xl font-bold font-tech text-cyan-400 my-3" data-i18n="tierDiamondAmount">50,000,000+ VND</div>
+                    <ul class="text-xs text-zinc-300 space-y-2.5 mt-4">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i> <span data-i18n="tierDiamondPerk1">Prominent primary logo on Robot Chassis & Competition Banner</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i> <span data-i18n="tierDiamondPerk2">Large logo placement on all Team Jerseys & Media backdrops</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i> <span data-i18n="tierDiamondPerk3">Exclusive 2-page feature in the official Engineering Portfolio</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i> <span data-i18n="tierDiamondPerk4">Keynote invitation to team launch events & workshops</span></li>
+                    </ul>
+                </div>
+                <button onclick="window.prefillSponsorship('Diamond Partner')" class="w-full mt-6 py-2.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-bold font-tech transition-all">
+                    SELECT DIAMOND
+                </button>
+            </div>
+
+            <!-- Gold Tier -->
+            <div class="tier-card tier-gold flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-tech text-amber-400 font-bold uppercase tracking-widest block mb-1">TIER 2</span>
+                    <h3 class="text-xl font-black font-title text-white" data-i18n="tierGoldName">Gold Partner</h3>
+                    <div class="text-xl font-bold font-tech text-amber-400 my-3" data-i18n="tierGoldAmount">25,000,000+ VND</div>
+                    <ul class="text-xs text-zinc-300 space-y-2.5 mt-4">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-amber-400 mt-0.5"></i> <span data-i18n="tierGoldPerk1">Prominent logo on Robot Body panels</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-amber-400 mt-0.5"></i> <span data-i18n="tierGoldPerk2">Logo on Team Uniforms & official website header</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-amber-400 mt-0.5"></i> <span data-i18n="tierGoldPerk3">Full-page company profile in the Engineering Portfolio</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-amber-400 mt-0.5"></i> <span data-i18n="tierGoldPerk4">Dedicated social media spotlight and recruitment access</span></li>
+                    </ul>
+                </div>
+                <button onclick="window.prefillSponsorship('Gold Partner')" class="w-full mt-6 py-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold font-tech transition-all">
+                    SELECT GOLD
+                </button>
+            </div>
+
+            <!-- Silver Tier -->
+            <div class="tier-card tier-silver flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-tech text-zinc-400 font-bold uppercase tracking-widest block mb-1">TIER 3</span>
+                    <h3 class="text-xl font-black font-title text-white" data-i18n="tierSilverName">Silver Partner</h3>
+                    <div class="text-xl font-bold font-tech text-zinc-300 my-3" data-i18n="tierSilverAmount">10,000,000+ VND</div>
+                    <ul class="text-xs text-zinc-300 space-y-2.5 mt-4">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-zinc-400 mt-0.5"></i> <span data-i18n="tierSilverPerk1">Logo placement on Team Banner & pit booth</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-zinc-400 mt-0.5"></i> <span data-i18n="tierSilverPerk2">Logo on official team website sponsor shelf</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-zinc-400 mt-0.5"></i> <span data-i18n="tierSilverPerk3">Half-page feature in Engineering Portfolio</span></li>
+                    </ul>
+                </div>
+                <button onclick="window.prefillSponsorship('Silver Partner')" class="w-full mt-6 py-2.5 rounded-lg bg-zinc-700/30 hover:bg-zinc-700/50 text-zinc-300 border border-zinc-600 text-xs font-bold font-tech transition-all">
+                    SELECT SILVER
+                </button>
+            </div>
+
+            <!-- Bronze Tier -->
+            <div class="tier-card tier-bronze flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-tech text-amber-600 font-bold uppercase tracking-widest block mb-1">TIER 4</span>
+                    <h3 class="text-xl font-black font-title text-white" data-i18n="tierBronzeName">Bronze Partner</h3>
+                    <div class="text-xl font-bold font-tech text-amber-600 my-3" data-i18n="tierBronzeAmount">5,000,000+ VND</div>
+                    <ul class="text-xs text-zinc-300 space-y-2.5 mt-4">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-amber-600 mt-0.5"></i> <span data-i18n="tierBronzePerk1">Name and logo on website sponsor wall</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-amber-600 mt-0.5"></i> <span data-i18n="tierBronzePerk2">Quarter-page acknowledgment in Portfolio</span></li>
+                    </ul>
+                </div>
+                <button onclick="window.prefillSponsorship('Bronze Partner')" class="w-full mt-6 py-2.5 rounded-lg bg-amber-800/20 hover:bg-amber-800/40 text-amber-400 border border-amber-800/50 text-xs font-bold font-tech transition-all">
+                    SELECT BRONZE
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center mb-16">
+            <a href="#contact-section" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold font-tech text-xs uppercase tracking-wider hover:from-blue-500 hover:to-indigo-500 transition-all shadow-[0_0_20px_rgba(141,164,255,0.3)]" data-i18n="sponsCtaBtn">
+                <i class="fa-solid fa-hand-holding-heart"></i> BECOME A SPONSOR
+            </a>
+        </div>
+
+        <!-- Verified Partners Shelf (Distilled from greenams.com) -->
+        <div class="mt-8 pt-10 border-t border-zinc-800/80">
+            <div class="text-center mb-8">
+                <span class="text-xs uppercase font-tech text-blue-400 tracking-wider font-bold block mb-1" data-i18n="partnersHeading">VERIFIED PARTNERS & SUPPORTERS</span>
+                <p class="text-xs text-zinc-400 font-tech" data-i18n="partnersSubheading">Proudly backed by leading technology corporations and national organizations:</p>
+            </div>
+
+            <!-- Diamond & Gold Highlight Partners -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-6">
+                <a href="https://www.mccsemi.com/" target="_blank" rel="noopener noreferrer" class="partner-badge border-cyan-500/40 hover:border-cyan-400 group">
+                    <div class="text-center">
+                        <span class="text-[10px] font-tech text-cyan-400 uppercase tracking-widest font-bold block mb-0.5">DIAMOND PARTNER</span>
+                        <span class="text-lg font-black font-title text-white group-hover:text-cyan-300 transition-colors">MCC Semi</span>
+                        <div class="text-[11px] text-zinc-500 font-tech">mccsemi.com</div>
+                    </div>
+                </a>
+
+                <a href="https://geleximco.vn/" target="_blank" rel="noopener noreferrer" class="partner-badge border-amber-500/40 hover:border-amber-400 group">
+                    <div class="text-center">
+                        <span class="text-[10px] font-tech text-amber-400 uppercase tracking-widest font-bold block mb-0.5">GOLD PARTNER</span>
+                        <span class="text-lg font-black font-title text-white group-hover:text-amber-300 transition-colors">Geleximco Group</span>
+                        <div class="text-[11px] text-zinc-500 font-tech">geleximco.vn</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Silver & Bronze Partners Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 max-w-4xl mx-auto text-center">
+                <a href="https://cmctelecom.vn/" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">CMC Telecom</span>
+                </a>
+                <a href="https://qualcomm.com" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">Qualcomm</span>
+                </a>
+                <a href="https://apaccorp.com.vn/" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">APAC Corp</span>
+                </a>
+                <a href="https://www.molex.com/en-us/home" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">Molex</span>
+                </a>
+                <a href="https://vgpipe.com.vn/" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">Thép Việt Đức</span>
+                </a>
+                <a href="https://vn.usembassy.gov/american-center-hanoi/" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">American Center</span>
+                </a>
+                <a href="https://auspan.com.au/" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">AUSPAN</span>
+                </a>
+                <a href="mailto:info@htharchitects.vn" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">HTH Architects</span>
+                </a>
+                <a href="https://mydungmc.com/vi" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">Mỹ Dung MC</span>
+                </a>
+                <a href="http://www.veic.com.vn/" target="_blank" rel="noopener noreferrer" class="partner-badge py-2.5">
+                    <span class="text-xs font-bold font-title text-zinc-300 hover:text-white">Viettronics</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 9: AWARDS & HALL OF HONORS -->
+    <section class="section-wrapper" id="awards-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="awardsTag">HALL OF HONORS</span>
+            <h2 class="section-title">
+                <span data-i18n="awardsTitle1">PROUD</span>
+                <span class="highlight" data-i18n="awardsTitle2">MILESTONES</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="awardsSubtitle">
+                Milestones that cement Hanoi - Amsterdam's reputation as Vietnam's top robotics hub on the world stage:
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card flex items-start gap-4 border-amber-500/30">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-amber-400 flex items-center justify-center text-2xl shrink-0">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-tech text-amber-400 uppercase tracking-widest block font-bold" data-i18n="award1Year">2024–2025</span>
+                    <h4 class="text-lg font-bold font-title text-white mt-0.5 mb-1.5" data-i18n="award1Title">FIRST World Championship Finalist Alliance</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="award1Desc">Edison Division Champions & World Championship Finalists in Houston, USA. Made history for Vietnam robotics.</p>
+                </div>
+            </div>
+
+            <div class="glass-card flex items-start gap-4 border-blue-500/30">
+                <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-400/30 text-blue-400 flex items-center justify-center text-2xl shrink-0">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-tech text-blue-400 uppercase tracking-widest block font-bold" data-i18n="award2Year">2024–2025</span>
+                    <h4 class="text-lg font-bold font-title text-white mt-0.5 mb-1.5" data-i18n="award2Title">Vietnam Championship Winning Alliance Captain & Design Award</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="award2Desc">Ranked as the champion alliance captain and selected as one of only two teams representing Vietnam at the World Championship.</p>
+                </div>
+            </div>
+
+            <div class="glass-card flex items-start gap-4 border-cyan-500/30">
+                <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 text-cyan-400 flex items-center justify-center text-2xl shrink-0">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-tech text-cyan-400 uppercase tracking-widest block font-bold" data-i18n="award3Year">2023–2024</span>
+                    <h4 class="text-lg font-bold font-title text-white mt-0.5 mb-1.5" data-i18n="award3Title">Vietnam Championship Winning Alliance Captain & Innovate Award</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="award3Desc">Ranked #1 across all robot performance metrics with groundbreaking mechanical intake innovation.</p>
+                </div>
+            </div>
+
+            <div class="glass-card flex items-start gap-4 border-emerald-500/30">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-400 flex items-center justify-center text-2xl shrink-0">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-tech text-emerald-400 uppercase tracking-widest block font-bold" data-i18n="award4Year">2025–2026</span>
+                    <h4 class="text-lg font-bold font-title text-white mt-0.5 mb-1.5" data-i18n="award4Title">Open-Source Bamboo Bot & 15+ STEM Camps</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed" data-i18n="award4Desc">Engineered Vietnam's first open-source FTC robot for FTC DECODE and trained over 5,000 youth through GART Expo & Wonderlab.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 10: FREQUENTLY ASKED QUESTIONS (GreenAms FAQ Inspired) -->
+    <section class="section-wrapper" id="faq-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="faqTag">COMMON INQUIRIES</span>
+            <h2 class="section-title">
+                <span data-i18n="faqTitle1">FREQUENTLY ASKED</span>
+                <span class="highlight" data-i18n="faqTitle2">QUESTIONS</span>
+            </h2>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="max-w-3xl mx-auto space-y-4">
+            <!-- FAQ 1 -->
+            <div class="faq-item open">
+                <div class="faq-header">
+                    <h4 class="text-sm sm:text-base font-bold text-white" data-i18n="faqQ1">What benefits do sponsors receive when partnering with our robotics teams?</h4>
+                    <i class="fa-solid fa-chevron-down faq-icon text-zinc-400 text-xs"></i>
+                </div>
+                <div class="faq-body" data-i18n="faqA1">
+                    Sponsors gain premier brand visibility on our robot chassis, team apparel, event banners, international tournament livestreams, and within our official Engineering Portfolio distributed to judges and industry leaders worldwide.
+                </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="faq-item">
+                <div class="faq-header">
+                    <h4 class="text-sm sm:text-base font-bold text-white" data-i18n="faqQ2">What is FIRST Tech Challenge (FTC) and why does it matter?</h4>
+                    <i class="fa-solid fa-chevron-down faq-icon text-zinc-400 text-xs"></i>
+                </div>
+                <div class="faq-body" data-i18n="faqA2">
+                    FIRST Tech Challenge is the world's premier high school robotics competition founded by inventor Dean Kamen. Students design, build, and program robots to compete in dynamic 2v2 arena games with a 30-second autonomous period and a 2-minute driver-controlled period.
+                </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="faq-item">
+                <div class="faq-header">
+                    <h4 class="text-sm sm:text-base font-bold text-white" data-i18n="faqQ3">How do ARISE 39081 and GreenAms 24751 cooperate?</h4>
+                    <i class="fa-solid fa-chevron-down faq-icon text-zinc-400 text-xs"></i>
+                </div>
+                <div class="faq-body" data-i18n="faqA3">
+                    Both ARISE 39081 and GreenAms 24751 are FIRST Tech Challenge sister teams from Hanoi - Amsterdam High School for Gifted ("When I say Ams, you say Rise!" & "When I say Green, you say Ams!"). We share research facilities, co-develop open-source robotics like Bamboo Bot, host collaborative STEM workshops (GART Expo, Wonderlab), and build a world-class training pipeline for Vietnamese students.
+                </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="faq-item">
+                <div class="faq-header">
+                    <h4 class="text-sm sm:text-base font-bold text-white" data-i18n="faqQ4">How can high school students join our robotics teams?</h4>
+                    <i class="fa-solid fa-chevron-down faq-icon text-zinc-400 text-xs"></i>
+                </div>
+                <div class="faq-body" data-i18n="faqA4">
+                    We hold annual recruitment trials every autumn for Hanoi - Amsterdam students, welcoming passionate minds across mechanical design, programming, electronics, and business outreach. No prior experience is required—only curiosity and dedication!
+                </div>
+            </div>
+
+            <!-- FAQ 5 -->
+            <div class="faq-item">
+                <div class="faq-header">
+                    <h4 class="text-sm sm:text-base font-bold text-white" data-i18n="faqQ5">How can other teams or organizations collaborate with us?</h4>
+                    <i class="fa-solid fa-chevron-down faq-icon text-zinc-400 text-xs"></i>
+                </div>
+                <div class="faq-body" data-i18n="faqA5">
+                    Teams and organizations can partner with us through technical mentorship, co-hosted workshops, STEM camps, sponsorship, or open-source CAD & code exchanges. We warmly welcome collaborations that empower the robotics community in Vietnam and worldwide.
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 11: SPONSORSHIP & CONTACT -->
+    <section class="section-wrapper" id="contact-section">
+        <div class="section-header">
+            <span class="section-tag" data-i18n="contactTag">JOIN OUR JOURNEY</span>
+            <h2 class="section-title">
+                <span data-i18n="contactTitle1">SPONSOR &</span>
+                <span class="highlight" data-i18n="contactTitle2">CONNECT</span>
+            </h2>
+            <div class="section-divider"></div>
+            <p class="max-w-2xl mx-auto text-sm text-zinc-400 mt-4 leading-relaxed" data-i18n="contactDesc">
+                Partner with Hanoi - Amsterdam robotics teams to empower Vietnam's brightest young engineering minds as we push the frontiers of technology.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Info (Leadership Contacts) -->
+            <div class="lg:col-span-5 space-y-4">
+                <div class="glass-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="logo-arise-round-black.png" alt="ARISE Logo" class="w-10 h-10 rounded-full">
+                        <div>
+                            <h4 class="font-bold text-white font-title text-base">Hanoi - Amsterdam Robotics</h4>
+                            <span class="text-xs text-blue-400 font-tech">FTC #39081 & FTC #24751</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3.5 text-xs text-zinc-300">
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-location-dot text-amber-400 text-sm mt-0.5"></i>
+                            <div>
+                                <span class="font-bold text-white block" data-i18n="addressLabel">Headquarters</span>
+                                <span class="text-zinc-400" data-i18n="addressVal">Hanoi - Amsterdam High School for Gifted, 1 Hoang Minh Giam, Cau Giay, Hanoi, Vietnam</span>
+                            </div>
+                        </div>
+
+                        <!-- Verified Contacts from greenams.com -->
+                        <div class="pt-2 border-t border-zinc-800 space-y-2.5">
+                            <span class="text-[11px] font-tech text-blue-400 font-bold uppercase tracking-wider block" data-i18n="leadershipLabel">Team Leadership & Contacts</span>
+                            
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-user-tie text-blue-400 mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-white block" data-i18n="coachTitle">Head Coach: Mr. Hai Dang</span>
+                                    <span class="text-zinc-400" data-i18n="coachContact">ngnhaidangvn@gmail.com • (+84) 968 228 118</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-chalkboard-user text-amber-400 mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-white block" data-i18n="managerTitle">Team Manager: Mr. Thanh Tung</span>
+                                    <span class="text-zinc-400" data-i18n="managerContact">tungnt@hnams.edu.vn • (+84) 968 666 245</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-envelope text-emerald-400 mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-white block" data-i18n="ariseContactTitle">ARISE 39081 Inquiries</span>
+                                    <span class="text-zinc-400" data-i18n="ariseContactVal">arise.ams39081@gmail.com</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Channels -->
+                    <div class="flex items-center gap-4 mt-6 pt-4 border-t border-zinc-800 text-lg text-zinc-400">
+                        <a href="https://github.com/greenamsroboticsteam/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors" title="GreenAms GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://www.youtube.com/@GreenAmsRoboticsTeam" target="_blank" rel="noopener noreferrer" class="hover:text-red-500 transition-colors" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://www.instagram.com/ftc24751_gart/" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition-colors" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@ftc24751_gart" target="_blank" rel="noopener noreferrer" class="hover:text-cyan-400 transition-colors" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="https://github.com/hugnq/arise39081" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" title="ARISE GitHub"><i class="fa-solid fa-code-fork"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Form -->
+            <div class="lg:col-span-7">
+                <form id="contactForm" class="glass-card space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-tech text-zinc-400 uppercase mb-1.5">NAME / ORGANIZATION</label>
+                            <input type="text" id="contactName" required placeholder="Your Name / Organization" class="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-tech text-zinc-400 uppercase mb-1.5">EMAIL ADDRESS</label>
+                            <input type="email" id="contactEmail" required placeholder="Your Email Address" class="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-tech text-zinc-400 uppercase mb-1.5">MESSAGE / SPONSORSHIP</label>
+                        <textarea id="contactMsg" rows="4" required placeholder="Message / Sponsorship inquiry..." class="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 transition-colors"></textarea>
+                    </div>
+
+                    <div id="contactSuccessMsg" class="hidden p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs text-center" data-i18n="contactSuccess">
+                        Thank you! Your message has been received by the team.
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold font-tech text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(141,164,255,0.3)] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="contactSendBtn">TRANSMIT MESSAGE</span>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="border-t border-zinc-800/80 py-8 text-center text-xs text-zinc-500 relative z-10 font-tech">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-white font-title">ARISE 39081 & GART 24751</span>
+                <span>•</span>
+                <span>HANOI - AMSTERDAM HIGH SCHOOL FOR GIFTED</span>
+            </div>
+            <div>
+                © 2026 Hanoi - Amsterdam Robotics Alliance • FIRST Tech Challenge
+            </div>
+        </div>
+    </footer>
+
+    <!-- Main Logic Script -->
+    <script src="js/main.js"></script>
 </body>
 </html>
